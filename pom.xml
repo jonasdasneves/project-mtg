@@ -12,7 +12,7 @@
 	<artifactId>project-mgt</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>project-mgt</name>
-	<description>Aplicação de gerenciamento de projetos</description>
+	<description>Gerenciador de tarefas</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -50,6 +50,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
 	</dependencies>
 
