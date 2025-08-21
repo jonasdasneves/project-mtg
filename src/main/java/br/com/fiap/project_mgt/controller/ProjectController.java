@@ -1,7 +1,6 @@
 package br.com.fiap.project_mgt.controller;
 
-import br.com.fiap.project_mgt.entity.Project;
-import org.springframework.hateoas.Link;
+import br.com.fiap.project_mgt.domain.entity.Project;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/project")
