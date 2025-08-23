@@ -1,6 +1,8 @@
-package br.com.fiap.project_mgt.controller;
+package br.com.fiap.project_mgt.interfaces.controller;
 
 import br.com.fiap.project_mgt.domain.entity.Project;
+import br.com.fiap.project_mgt.interfaces.dto.ProjectOutDTO;
+import br.com.fiap.project_mgt.interfaces.dto.ProjectLazyOutDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,42 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getProjects() {
-        return ResponseEntity.ok(projects);
+    public ResponseEntity<List<ProjectLazyOutDTO>> getProjects() {
+
+        List<ProjectLazyOutDTO> dados = projects.stream()
+                .map(
+                        p -> new ProjectLazyOutDTO(
+                                p.getId(),
+                                p.getName(),
+                                p.getStartDate(),
+                                p.getEndDate())
+                ).toList();
+
+        return ResponseEntity.ok(dados);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectOutDTO> getProject(@PathVariable("id") Long id) {
+
+        try {
+            final ProjectOutDTO projectOutDTO = projects.stream()
+                    .filter(p -> p.getId().equals(id))
+                    .map(
+                            p -> new ProjectOutDTO(
+                                    p.getId(),
+                                    p.getName(),
+                                    p.getDescription(),
+                                    p.getStartDate(),
+                                    p.getEndDate())
+                    )
+                    .findFirst()
+                    .orElseThrow();
+
+            return ResponseEntity.ok(projectOutDTO);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping
