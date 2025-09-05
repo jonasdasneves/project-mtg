@@ -3,6 +3,7 @@ package br.com.fiap.projectmgt.application.service.Impl;
 import br.com.fiap.projectmgt.application.service.ProjectService;
 import br.com.fiap.projectmgt.domain.entity.Project;
 import br.com.fiap.projectmgt.infrastructure.entity.JpaProjectEntity;
+import br.com.fiap.projectmgt.infrastructure.mapper.JpaProjectMapper;
 import br.com.fiap.projectmgt.infrastructure.repository.JpaProjectEntityRepository;
 import br.com.fiap.projectmgt.interfaces.page.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,11 +22,14 @@ public abstract class ProjectServiceImpl implements ProjectService {
     public Page<Project> listAll(int pageNumber, int pageSize){
         //Não é uma boa pratica usar o repository diretamente na camada
         // controller nem a classe utilizada no mapeamento do banco. Apenas para exemplo!!
-        org.springframework.data.domain.Page<JpaProjectEntity> pageOfProjects = this.repository.findAll(
+        Page<Project> pageOfProjects = (Page<Project>) this.repository.findAll(
                 Pageable
                         .ofSize(pageSize)
-                        .withPage(pageNumber));
-    };
+                        .withPage(pageNumber)
+        ).map(JpaProjectMapper::toEntity);
+
+        return pageOfProjects;
+    }
 
 
     @Override

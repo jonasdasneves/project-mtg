@@ -6,19 +6,12 @@ import br.com.fiap.projectmgt.domain.exceptions.ResourceNotFoundException;
 import br.com.fiap.projectmgt.infrastructure.entity.JpaProjectEntity;
 import br.com.fiap.projectmgt.infrastructure.mapper.DtoProjectMapper;
 import br.com.fiap.projectmgt.infrastructure.mapper.JpaProjectMapper;
-import br.com.fiap.projectmgt.infrastructure.repository.JpaProjectEntityRepository;
-import br.com.fiap.projectmgt.interfaces.dto.ProjectLazyOutDto;
 import br.com.fiap.projectmgt.interfaces.dto.ProjectOutDto;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -37,23 +30,17 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProjectLazyOutDto>> getProjects(@RequestParam(name = "pageSize", required = false,defaultValue = "10") Integer pageSize,
+    public ResponseEntity<PageImpl<ProjectOutDto>> getProjects(@RequestParam(name = "pageSize", required = false,defaultValue = "10") Integer pageSize,
                                                                @RequestParam(name = "pageNumber", required = false,defaultValue = "0") Integer pageNumber) {
 
         br.com.fiap.projectmgt.interfaces.page.Page<Project> projects = this.projectService.listAll(pageNumber, pageSize);
 
-
-
-        final List<ProjectLazyOutDto> allProjects = projects.getContent().stream()
+        final List<ProjectOutDto> allProjects = projects.getContent().stream()
                 //sem garantia de ordem
                 .parallel()
-                .map(
-                        p -> new ProjectLazyOutDto(
-                                p.getId(),
-                                p.getName(),
-                                p.getStartDate(),
-                                p.getEndDate())
-                ).toList();
+                //.map(JpaProjectMapper::toEntity)
+                .map(DtoProjectMapper::toDto)
+                .toList();
 
         return ResponseEntity.ok(new PageImpl<>(allProjects, projects.getPageable(), projects.getTotalElements()));
     }
