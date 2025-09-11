@@ -5,6 +5,6 @@ import java.time.LocalDate;
 public record ProjectOutDto(Long id,
                             String name,
                             String description,
-                            LocalDate startDate, LocalDate endDate
-) {
-}
+                            LocalDate startDate,
+                            LocalDate endDate
+) { }

@@ -1,13 +1,11 @@
 package br.com.fiap.projectmgt.interfaces.controller;
 
 import br.com.fiap.projectmgt.application.service.ProjectService;
+import br.com.fiap.projectmgt.domain.entity.Page;
 import br.com.fiap.projectmgt.domain.entity.Project;
 import br.com.fiap.projectmgt.domain.exceptions.ResourceNotFoundException;
-import br.com.fiap.projectmgt.infrastructure.entity.JpaProjectEntity;
 import br.com.fiap.projectmgt.infrastructure.mapper.DtoProjectMapper;
-import br.com.fiap.projectmgt.infrastructure.mapper.JpaProjectMapper;
 import br.com.fiap.projectmgt.interfaces.dto.ProjectOutDto;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +22,29 @@ public class ProjectController {
 //    @Autowired uma maneira de fazer injecao de dependencia. Sempre dar preferencia para o construtor.
     private final ProjectService projectService;
 
-
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
     @GetMapping
-    public ResponseEntity<PageImpl<ProjectOutDto>> getProjects(@RequestParam(name = "pageSize", required = false,defaultValue = "10") Integer pageSize,
+    public ResponseEntity<Page<ProjectOutDto>> getProjects(@RequestParam(name = "pageSize", required = false,defaultValue = "10") Integer pageSize,
                                                                @RequestParam(name = "pageNumber", required = false,defaultValue = "0") Integer pageNumber) {
 
-        br.com.fiap.projectmgt.interfaces.page.Page<Project> projects = this.projectService.listAll(pageNumber, pageSize);
+        Page<Project> projectsPage = this.projectService.listAll(pageNumber, pageSize);
 
-        final List<ProjectOutDto> allProjects = projects.getContent().stream()
-                //sem garantia de ordem
+        List<ProjectOutDto> projectsDto = projectsPage
+                .pageItems()
+                .stream()
                 .parallel()
-                //.map(JpaProjectMapper::toEntity)
                 .map(DtoProjectMapper::toDto)
                 .toList();
 
-        return ResponseEntity.ok(new PageImpl<>(allProjects, projects.getPageable(), projects.getTotalElements()));
+        Page<ProjectOutDto> projectsDtoPage = new Page<>(
+                projectsPage.numberOfPages(),
+                projectsPage.pageNumber(),
+                projectsDto);
+
+        return ResponseEntity.ok(projectsDtoPage);
     }
 
     @GetMapping("/{id}")

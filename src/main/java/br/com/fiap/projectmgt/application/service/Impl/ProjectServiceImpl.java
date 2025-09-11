@@ -2,39 +2,28 @@ package br.com.fiap.projectmgt.application.service.Impl;
 
 import br.com.fiap.projectmgt.application.service.ProjectService;
 import br.com.fiap.projectmgt.domain.entity.Project;
-import br.com.fiap.projectmgt.infrastructure.entity.JpaProjectEntity;
+import br.com.fiap.projectmgt.domain.repository.ProjectRepository;
 import br.com.fiap.projectmgt.infrastructure.mapper.JpaProjectMapper;
+import br.com.fiap.projectmgt.infrastructure.mapper.PageMapper;
 import br.com.fiap.projectmgt.infrastructure.repository.JpaProjectEntityRepository;
-import br.com.fiap.projectmgt.interfaces.page.Page;
-import org.springframework.data.domain.PageImpl;
+import br.com.fiap.projectmgt.domain.entity.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+public class ProjectServiceImpl implements ProjectService {
 
-public abstract class ProjectServiceImpl implements ProjectService {
+    private final ProjectRepository repository;
 
-    private final JpaProjectEntityRepository repository;
-
-    public ProjectServiceImpl(JpaProjectEntityRepository jpaProjectEntityRepository, JpaProjectEntityRepository repository) {
+    public ProjectServiceImpl(ProjectRepository repository) {
         this.repository = repository;
     }
 
     public Page<Project> listAll(int pageNumber, int pageSize){
-        //Não é uma boa pratica usar o repository diretamente na camada
-        // controller nem a classe utilizada no mapeamento do banco. Apenas para exemplo!!
-        Page<Project> pageOfProjects = (Page<Project>) this.repository.findAll(
-                Pageable
-                        .ofSize(pageSize)
-                        .withPage(pageNumber)
-        ).map(JpaProjectMapper::toEntity);
-
-        return pageOfProjects;
+        return this.repository.listAllProjects(pageNumber, pageSize);
     }
-
 
     @Override
     public Project findById(Long projectId) {
-        return null;
+        return this.repository.findProjectById(projectId);
     }
 
     @Override
